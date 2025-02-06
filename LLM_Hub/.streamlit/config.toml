@@ -1,0 +1,8 @@
+[theme]
+base="Use system setting"
+
+[client]
+toolbarMode = "viewer"
+
+[browser]
+gatherUsageStats = false
