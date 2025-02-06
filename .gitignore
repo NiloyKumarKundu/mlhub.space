@@ -169,3 +169,11 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+
+# Custom
+ollama/
+models/
+logs/
+./LLM-Hub/logs/
+nginx/
