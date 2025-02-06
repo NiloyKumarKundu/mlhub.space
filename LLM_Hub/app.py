@@ -108,7 +108,7 @@ def main() -> None:
             "Choose Model",
             available_models,
             placeholder="Choose an option",
-            index=4
+            index=0
         )
         
         st.markdown("")
