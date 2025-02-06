@@ -1,0 +1,58 @@
+version: "3.8"
+
+networks:
+  llm_network:
+    name: llm_network
+    driver: bridge
+
+services:
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    container_name: nginx-proxy
+    ports:
+      - "80:80" # Expose Nginx on port 80
+      - "443:443" # Expose Nginx on port 443 for HTTPS
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro # Required for automatic configuration
+      - ${NGINX_SSL_PATH}:/etc/nginx/certs:ro # Path to SSL certificate
+      - ${NGINX_LOGS_PATH}:/var/log/nginx # Mount Nginx logs directory
+    networks:
+      - llm_network
+
+  app:
+    build:
+      context: ./LLM_Hub
+    environment:
+      - STREAMLIT_SERVER_ADDRESS=${STREAMLIT_SERVER_ADDRESS}
+      - STREAMLIT_SERVER_PORT=${STREAMLIT_SERVER_PORT}
+      - VIRTUAL_HOST=${VIRTUAL_HOST} # Set the virtual host for Nginx to route traffic
+    volumes:
+      - ${APP_LOGS_PATH}:/app/logs # Mount logs directory to persist logs
+    networks:
+      - llm_network
+    depends_on:
+      - nginx-proxy
+      - ollama
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    # runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=${NVIDIA_VISIBLE_DEVICES}
+      - NVIDIA_DRIVER_CAPABILITIES=${NVIDIA_DRIVER_CAPABILITIES}
+    volumes:
+      - ${OLLAMA_CONFIG_PATH}:/root/.ollama # Persist Ollama configuration
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+    networks:
+      - llm_network
+    depends_on:
+      - nginx-proxy
+
+      # sudo docker run --rm --runtime=nvidia --gpus all ubuntu nvidia-smi

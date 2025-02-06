@@ -111,23 +111,22 @@ def main() -> None:
             index=4
         )
         
-        # Create a container for the button at the bottom
-        button_container = st.container()
+        st.markdown("")
+        st.markdown("")
+        st.markdown(
+            """
+            You can also explore:
+            * [Finance.MLHub.space](https://finance.mlhub.space)
+            """
+        )
         
-        # Add some vertical space to push the button down
-        st.markdown('<div style="flex: 1;"></div>', unsafe_allow_html=True)
-        
-        # Place the button in the container
-        with button_container:
-            st.button("Reset Chat")
+ 
             
             
     # Map model name if necessary
     if selected_model == "deepseek-v3":
         selected_model = "nezahatkorkmaz/deepseek-v3"
     logger.info(f"User selected model: {selected_model}")
-    
-    local_css("src/css/style.css")
     
 
     # Display existing chat history
