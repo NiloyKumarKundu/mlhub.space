@@ -1,15 +1,22 @@
 import time
 import asyncio
 import streamlit as st
-from src.Services.chatbot import chatbot
+from src.Services.chatbot import Chatbot
 from src import logger
+import ssl
+
+ssl._create_default_https_context = ssl._create_unverified_context
+
+
+if 'chatbot' not in st.session_state:
+    st.session_state.chatbot = Chatbot()
 
 
 def render_chat_history() -> None:
     """
     Renders the session chat history in the Streamlit app.
     """
-    history = chatbot.get_session_history()
+    history = st.session_state.chatbot.get_session_history()
     for message in history.messages:
         if message.type == "human":
             with st.chat_message("human"):
@@ -29,7 +36,7 @@ async def stream_response(user_prompt: str, placeholder: st.delta_generator.Delt
     """
     response_text = ""
     # Iterate over the asynchronous stream of response chunks from the chatbot.
-    async for chunk in chatbot.process_input_streaming(user_prompt):
+    async for chunk in st.session_state.chatbot.process_input_streaming(user_prompt):
         response_text += chunk
         placeholder.markdown(response_text)
         # Optional: introduce a small delay to simulate a realistic streaming effect.
@@ -59,7 +66,7 @@ def reset_session() -> None:
     After resetting, the app is rerun to reflect the changes.
     """
     logger.info("Resetting chat session...")
-    chatbot.reset_session()  # Ensure this method exists in your chatbot module.
+    st.session_state.chatbot.reset_session()  # Ensure this method exists in your chatbot module.
     st.experimental_rerun()
 
 
@@ -92,24 +99,35 @@ def main() -> None:
         Choose from the available models, ask a question, and compare the answers!
         """
     )
-
-    # Sidebar: model selection
-    available_models = ["llama3.2", "smollm2", "mistral", "deepseek-v3", "deepseek-r1"]
-    selected_model = st.sidebar.selectbox(
-        "Choose Model",
-        available_models,
-        placeholder="Choose an option",
-        index=4
-    )
+ 
+    # Sidebar content
+    with st.sidebar:
+        # Model selection at the top
+        available_models = ["llama3.2", "smollm2", "mistral", "deepseek-v3", "deepseek-r1"]
+        selected_model = st.selectbox(
+            "Choose Model",
+            available_models,
+            placeholder="Choose an option",
+            index=4
+        )
+        
+        # Create a container for the button at the bottom
+        button_container = st.container()
+        
+        # Add some vertical space to push the button down
+        st.markdown('<div style="flex: 1;"></div>', unsafe_allow_html=True)
+        
+        # Place the button in the container
+        with button_container:
+            st.button("Reset Chat")
+            
+            
     # Map model name if necessary
     if selected_model == "deepseek-v3":
         selected_model = "nezahatkorkmaz/deepseek-v3"
     logger.info(f"User selected model: {selected_model}")
     
     local_css("src/css/style.css")
-    
-    with st.sidebar:
-        st.button("button sidebar 1")
     
 
     # Display existing chat history

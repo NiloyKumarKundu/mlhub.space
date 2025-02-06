@@ -6,14 +6,20 @@ from langchain_core.runnables import RunnablePassthrough
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_core.messages import trim_messages
 from operator import itemgetter
+import streamlit as st
+import uuid
 from src import logger
-from src.config.config import SESSION_ID
-
 
 class Chatbot:
     def __init__(self):
+        # Initialize the store dictionary
         self.store = {}
-        self.session_id = SESSION_ID
+        
+        # Initialize or get session ID from Streamlit's session state
+        if 'session_id' not in st.session_state:
+            st.session_state.session_id = str(uuid.uuid4())
+        
+        self.session_id = st.session_state.session_id
 
     def get_session_history(self):
         """Retrieve chat history for the current session."""
@@ -25,8 +31,6 @@ class Chatbot:
         """Return the chatbot's prompt."""
         prompt_template = ChatPromptTemplate([
             ("system", "You are a chatbot named MLHub.space. Answer all questions to the best of your ability."),
-            ('human', 'What is up?'),
-            ('assistant', 'I am a chatbot. I am here to help you. How can I help you today?'),
             MessagesPlaceholder(variable_name='messages'),
         ])
         return prompt_template
@@ -63,28 +67,45 @@ class Chatbot:
         trimmer = self.get_trimmer()
         
         chain = (
-            RunnablePassthrough.assign(messages=itemgetter("messages") | trimmer) | 
-            prompt | 
-            llm | 
-            output_parser
+            RunnablePassthrough.assign(messages=itemgetter("messages") | trimmer)
+            | prompt
+            | llm
+            | output_parser
         )
         return chain
 
     def process_input(self, user_input):
         """Process user input through the chain."""
         chain = self.get_chain()
-        model_with_history = RunnableWithMessageHistory(chain, self.get_session_history, input_messages_key='messages')
-        response = model_with_history.invoke({'messages': user_input}, config={})
+        model_with_history = RunnableWithMessageHistory(
+            chain,
+            self.get_session_history,
+            input_messages_key='messages'
+        )
+        response = model_with_history.invoke(
+            {'messages': user_input},
+            config={'configurable': {'session_id': self.session_id}}
+        )
         return model_with_history, response
-    
+
     async def process_input_streaming(self, user_input):
         """Process user input and yield streamed chunks."""
         chain = self.get_chain()
-        model_with_history = RunnableWithMessageHistory(chain, self.get_session_history, input_messages_key='messages')
-
-        async for chunk in model_with_history.astream({'messages': user_input}, config={}):
+        model_with_history = RunnableWithMessageHistory(
+            chain,
+            self.get_session_history,
+            input_messages_key='messages'
+        )
+        async for chunk in model_with_history.astream(
+            {'messages': user_input},
+            config={'configurable': {'session_id': self.session_id}}
+        ):
             yield chunk
 
-
-
-chatbot = Chatbot()
+    def reset_session(self):
+        """Reset the current session's chat history."""
+        if self.session_id in self.store:
+            del self.store[self.session_id]
+            # Generate new session ID
+            st.session_state.session_id = str(uuid.uuid4())
+            self.session_id = st.session_state.session_id

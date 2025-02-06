@@ -1,5 +1,13 @@
+section[data-testid="stSidebar"] {
+  /* display: flex; */
+  flex-direction: column;
+}
+section[data-testid="stSidebar"] > div {
+  flex: 1;
+}
 section[data-testid="stSidebar"] div.stButton button {
-  width: 90%;
-  position: absolute;
-  bottom: 0px;
+  width: 15%;
+  position: fixed;
+  bottom: 20px;
+  /* margin-left: 5%; */
 }
