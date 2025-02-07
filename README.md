@@ -102,6 +102,13 @@ Ensure you have the following installed:
 
 Include relevant screenshots of the application interface to help visualize the system in action.
 
+- Image 1:
+  ![screenshot -1](images/img-1.png)
+- Image 2:
+  ![screenshot -1](images/img-1.png)
+- Image 3:
+  ![screenshot -1](images/img-1.png)
+
 ## Notes
 
 - Ensure that the virtual host (`VIRTUAL_HOST`) is correctly configured for Nginx to route traffic.
