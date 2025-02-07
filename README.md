@@ -30,9 +30,9 @@ Ensure you have the following installed:
 2.  **Configure Environment Variables:** Create a .env file in the project root and define the required environment variables:
 
     ```
-    STREAMLIT_SERVER_ADDRESS=0.0.0.0
-    STREAMLIT_SERVER_PORT=8501
-    VIRTUAL_HOST=your.domain.com
+    STREAMLIT_SERVER_ADDRESS=your_streamlit_server_address
+    STREAMLIT_SERVER_PORT=your_streamlit_server_port
+    VIRTUAL_HOST=your.domain.com (e.g. mlhub.space)
     NGINX_SSL_PATH=/path/to/ssl
     NGINX_LOGS_PATH=/path/to/nginx/logs
     APP_LOGS_PATH=/path/to/app/logs
