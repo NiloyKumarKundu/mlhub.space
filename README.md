@@ -94,15 +94,15 @@ Ensure you have the following installed:
 
 After successfully running the Docker containers, you must install LLMs using Ollama. Follow these steps:
 
-1. Access the running Ollama container interactively:
+1.  Access the running Ollama container interactively:
 
-   `docker exec -it ollama /bin/bash`
+        docker exec -it ollama /bin/bash
 
-2. Install the desired LLM. For example, to install llama3.2, run:
+2.  Install the desired LLM. For example, to install llama3.2, run:
 
-   `ollama run llama3.2`
+        ollama run llama3.2
 
-3. Once downloaded, the model is ready for use. Repeat the process to install additional LLMs as needed.
+3.  Once downloaded, the model is ready for use. Repeat the process to install additional LLMs as needed.
 
 ## Screenshots
 
