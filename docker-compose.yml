@@ -54,5 +54,3 @@ services:
       - llm_network
     depends_on:
       - nginx-proxy
-
-      # sudo docker run --rm --runtime=nvidia --gpus all ubuntu nvidia-smi
