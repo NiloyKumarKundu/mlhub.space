@@ -1,4 +1,3 @@
-import time
 import asyncio
 import streamlit as st
 from src.Services.chatbot import Chatbot
