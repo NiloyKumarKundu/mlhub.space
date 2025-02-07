@@ -94,12 +94,12 @@ Ensure you have the following installed:
 
 Include relevant screenshots of the application interface to help visualize the system in action.
 
-- Image 1:
+- Site User Interface Overview
   ![screenshot -1](images/img-1.png)
-- Image 2:
-  ![screenshot -1](images/img-1.png)
-- Image 3:
-  ![screenshot -1](images/img-1.png)
+- Developer Information Retrieval via System Prompt
+  ![screenshot -1](images/img-2.png)
+- Context-Aware AI Conversation Based on Prior Input
+  ![screenshot -1](images/img-3.png)
 
 ## Notes
 
