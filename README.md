@@ -76,27 +76,19 @@ Ensure you have the following installed:
 
 ### Start Services
 
-    ```
     docker-compose up -d
-    ```
 
 ### Stop Services
 
-    ```
     docker-compose down
-    ```
 
 ### View Logs
 
-    ```
     docker-compose logs -f
-    ```
 
 ### Rebuild Services
 
-    ```
     docker-compose up --build -d
-    ```
 
 ## Screenshots
 
