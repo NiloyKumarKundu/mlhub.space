@@ -79,11 +79,11 @@ class Chatbot:
         ])
         return prompt_template
 
-    def get_model(self):
+    def get_model(self, model):
         """Load the chatbot model."""
         try:
             llm = ChatOllama(
-                model="llama3.2",
+                model=model,
                 convert_system_message_to_human=True
             )
             return llm
@@ -91,24 +91,24 @@ class Chatbot:
             logger.error(f"Failed to load model: {e}")
             raise
 
-    def get_trimmer(self):
+    def get_trimmer(self, model):
         """Set up message trimming logic."""
         trimmer = trim_messages(
             max_tokens=1024,
             strategy="last",
-            token_counter=self.get_model(),
+            token_counter=self.get_model(model),
             include_system=True,
             allow_partial=False,
             start_on='human'
         )
         return trimmer
 
-    def get_chain(self):
+    def get_chain(self, model):
         """Build the chain for processing the messages."""
-        llm = self.get_model()
+        llm = self.get_model(model)
         output_parser = StrOutputParser()
         prompt = self.get_prompt()
-        trimmer = self.get_trimmer()
+        trimmer = self.get_trimmer(model)
         
         chain = (
             RunnablePassthrough.assign(messages=itemgetter("messages") | trimmer)
@@ -132,9 +132,9 @@ class Chatbot:
         )
         return model_with_history, response
 
-    async def process_input_streaming(self, user_input):
+    async def process_input_streaming(self, user_input, model):
         """Process user input and yield streamed chunks."""
-        chain = self.get_chain()
+        chain = self.get_chain(model)
         model_with_history = RunnableWithMessageHistory(
             chain,
             self.get_session_history,

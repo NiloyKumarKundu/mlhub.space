@@ -25,7 +25,7 @@ def render_chat_history() -> None:
                 st.markdown(message.content)
 
 
-async def stream_response(user_prompt: str, placeholder: st.delta_generator.DeltaGenerator) -> None:
+async def stream_response(user_prompt: str, placeholder: st.delta_generator.DeltaGenerator, model: str) -> None:
     """
     Asynchronously streams response chunks from the chatbot and updates the UI placeholder.
 
@@ -35,7 +35,7 @@ async def stream_response(user_prompt: str, placeholder: st.delta_generator.Delt
     """
     response_text = ""
     # Iterate over the asynchronous stream of response chunks from the chatbot.
-    async for chunk in st.session_state.chatbot.process_input_streaming(user_prompt):
+    async for chunk in st.session_state.chatbot.process_input_streaming(user_prompt, model):
         response_text += chunk
         placeholder.markdown(response_text)
         # Optional: introduce a small delay to simulate a realistic streaming effect.
@@ -110,6 +110,11 @@ def main() -> None:
             index=0
         )
         
+        # Map model name if necessary
+        if selected_model == "deepseek-v3":
+            selected_model = "nezahatkorkmaz/deepseek-v3"
+        logger.info(f"User selected model: {selected_model}")
+        
         st.markdown("")
         st.markdown("")
         st.markdown(
@@ -118,14 +123,6 @@ def main() -> None:
             * [Finance.MLHub.space](https://finance.mlhub.space)
             """
         )
-        
- 
-            
-            
-    # Map model name if necessary
-    if selected_model == "deepseek-v3":
-        selected_model = "nezahatkorkmaz/deepseek-v3"
-    logger.info(f"User selected model: {selected_model}")
     
 
     # Display existing chat history
@@ -142,7 +139,7 @@ def main() -> None:
         # Stream the AI's response in real time
         with st.chat_message("ai"):
             message_placeholder = st.empty()
-            run_async_function(lambda: stream_response(user_prompt, message_placeholder))
+            run_async_function(lambda: stream_response(user_prompt, message_placeholder, selected_model))
 
 
 
