@@ -1,6 +1,6 @@
 import asyncio
 import streamlit as st
-from src.Services.chatbot import Chatbot
+from src.services.chatbot import Chatbot
 from src import logger
 import ssl
 
