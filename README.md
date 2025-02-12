@@ -46,6 +46,7 @@ Ensure you have the following installed:
     ```
     LANGSMITH_API_KEY=your_langsmith_api_key
     LANGCHAIN_PROJECT=your_langchain_project
+    OLLAMA_SERVER_ADDRESS="http://ollama:11434"
     ```
 
 3.  **Build and Start the Containers:**
