@@ -9,6 +9,9 @@ from operator import itemgetter
 import streamlit as st
 import uuid
 from src import logger
+from dotenv import load_dotenv
+import os
+load_dotenv()
 
 class Chatbot:
     def __init__(self):
@@ -84,7 +87,8 @@ class Chatbot:
         try:
             llm = ChatOllama(
                 model=model,
-                convert_system_message_to_human=True
+                convert_system_message_to_human=True,
+                base_url=os.getenv('OLLAMA_SERVER_ADDRESS')
             )
             return llm
         except Exception as e:
@@ -93,44 +97,37 @@ class Chatbot:
 
     def get_trimmer(self, model):
         """Set up message trimming logic."""
-        trimmer = trim_messages(
-            max_tokens=1024,
-            strategy="last",
-            token_counter=self.get_model(model),
-            include_system=True,
-            allow_partial=False,
-            start_on='human'
-        )
+        try:
+            trimmer = trim_messages(
+                max_tokens=1024,
+                strategy="last",
+                token_counter=self.get_model(model),
+                include_system=True,
+                allow_partial=False,
+                start_on='human'
+            )
+        except Exception as e:  
+            return f"failed to load trimmer: {e}"
         return trimmer
 
     def get_chain(self, model):
         """Build the chain for processing the messages."""
-        llm = self.get_model(model)
-        output_parser = StrOutputParser()
-        prompt = self.get_prompt()
-        trimmer = self.get_trimmer(model)
+        try:
+            llm = self.get_model(model)
+            output_parser = StrOutputParser()
+            prompt = self.get_prompt()
+            trimmer = self.get_trimmer(model)
         
-        chain = (
-            RunnablePassthrough.assign(messages=itemgetter("messages") | trimmer)
-            | prompt
-            | llm
-            | output_parser
-        )
+            chain = (
+                RunnablePassthrough.assign(messages=itemgetter("messages") | trimmer)
+                | prompt
+                | llm
+                | output_parser
+            )
+        except Exception as e:
+            return f"Failed to generate chain: {e}"
         return chain
-
-    def process_input(self, user_input):
-        """Process user input through the chain."""
-        chain = self.get_chain()
-        model_with_history = RunnableWithMessageHistory(
-            chain,
-            self.get_session_history,
-            input_messages_key='messages'
-        )
-        response = model_with_history.invoke(
-            {'messages': user_input},
-            config={'configurable': {'session_id': self.session_id}}
-        )
-        return model_with_history, response
+    
 
     async def process_input_streaming(self, user_input, model):
         """Process user input and yield streamed chunks."""

@@ -19,7 +19,7 @@ services:
     networks:
       - llm_network
 
-  app:
+  llm_hub:
     build:
       context: ./LLM_Hub
     environment:

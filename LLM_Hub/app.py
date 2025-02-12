@@ -57,22 +57,16 @@ def run_async_function(coro) -> None:
         loop.close()
 
 
-def reset_session() -> None:
-    """
-    Resets the chatbot session and refreshes the Streamlit app.
+# def reset_session() -> None:
+#     """
+#     Resets the chatbot session and refreshes the Streamlit app.
     
-    It is assumed that the chatbot has a method `reset_session()` to clear the session.
-    After resetting, the app is rerun to reflect the changes.
-    """
-    logger.info("Resetting chat session...")
-    st.session_state.chatbot.reset_session()  # Ensure this method exists in your chatbot module.
-    st.experimental_rerun()
-
-
-
-def local_css(file_name):
-    with open(file_name) as f:
-        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+#     It is assumed that the chatbot has a method `reset_session()` to clear the session.
+#     After resetting, the app is rerun to reflect the changes.
+#     """
+#     logger.info("Resetting chat session...")
+#     st.session_state.chatbot.reset_session()  # Ensure this method exists in your chatbot module.
+#     st.experimental_rerun()
 
 
 
@@ -126,7 +120,7 @@ def main() -> None:
     
 
     # Display existing chat history
-    render_chat_history()
+    render_chat_history() 
 
     # Get user input from the chat interface
     user_prompt = st.chat_input("What is up?")
@@ -135,12 +129,10 @@ def main() -> None:
         # Render the user's message
         with st.chat_message("human"):
             st.markdown(user_prompt)
-
         # Stream the AI's response in real time
         with st.chat_message("ai"):
             message_placeholder = st.empty()
             run_async_function(lambda: stream_response(user_prompt, message_placeholder, selected_model))
-
 
 
 if __name__ == "__main__":
